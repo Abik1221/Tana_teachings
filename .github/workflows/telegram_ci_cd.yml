@@ -3,7 +3,7 @@ name: Telegram Notification (All Branches)
 on:
   push:
     branches:
-      - '**'   # triggers on ALL branches
+      - '**'  # triggers on ALL branches
   pull_request:
     types: [opened, closed]
 
@@ -16,17 +16,17 @@ jobs:
         run: |
           # Build message
           COMMIT_MSG=$(echo "${{ github.event.head_commit.message }}" | sed 's/"/\\"/g')
-          BRANCH=$(echo "${GITHUB_REF#refs/heads/}")
-          USERNAME=${{ github.actor }}
+          BRANCH="${GITHUB_REF#refs/heads/}"
+          USERNAME="${{ github.actor }}"
 
-          MESSAGE="🧠 *Tana Teachings Update*%0A\
-👤 *${USERNAME}* pushed new code%0A\
-🌿 Branch: *${BRANCH}*%0A\
-📝 Commit: ${COMMIT_MSG}%0A\
-🔗 [View Commit](https://github.com/${{ github.repository }}/commit/${{ github.sha }})"
+          MESSAGE="🧠 *Tana Teachings Update*%0A"
+          MESSAGE+="👤 *${USERNAME}* pushed new code%0A"
+          MESSAGE+="🌿 Branch: *${BRANCH}*%0A"
+          MESSAGE+="📝 Commit: ${COMMIT_MSG}%0A"
+          MESSAGE+="🔗 [View Commit](https://github.com/${{ github.repository }}/commit/${{ github.sha }})"
 
           # Send to Telegram
-          curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage \
-            -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
-            -d parse_mode=Markdown \
-            -d text="$MESSAGE"
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage" \
+            -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
+            -d "parse_mode=Markdown" \
+            -d "text=${MESSAGE}"
