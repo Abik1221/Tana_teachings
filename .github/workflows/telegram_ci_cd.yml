@@ -25,6 +25,7 @@ jobs:
           MESSAGE+="📝 Commit: ${COMMIT_MSG}%0A"
           MESSAGE+="🔗 [View Commit](https://github.com/${{ github.repository }}/commit/${{ github.sha }})"
 
+          
           # Send to Telegram
           curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage" \
             -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
