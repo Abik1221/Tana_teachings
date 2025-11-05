@@ -1,16 +1,95 @@
-# React + Vite
+# 🖥️ Tana Teachings — Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Professional, responsive, and scalable frontend for the **Tana Teachings** platform, built with **React (Vite)**, **Tailwind CSS**, and reusable components for clean UI and fast development.
 
-Currently, two official plugins are available:
+For a deeper architecture and component reference, see DOCS.md.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Fully responsive layout (desktop & mobile)
+- Clean UI with Tailwind CSS
+- Reusable components structure (Navbar, HeroSection, HowItWorks, Footer)
+- Organized folder system for scalability
+- Integration-ready setup for backend APIs
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Quickstart (Local)
+
+### Clone Repo
+
+```bash
+git clone https://github.com/Abik1221/Tana_teachings.git
+cd Tana_teachings/frontend
+Switch to Your Branch
+
+git checkout mast-branch
+Install Dependencies
+
+npm install
+Run Development Server
+
+npm run dev
+Open in browser: http://localhost:5173/
+
+
+
+Scripts
+Command	Description
+npm run dev	Start local development server
+npm run build	Build production-ready app
+npm run preview	Preview production build locally
+
+Development Workflow
+Work on your branch only:
+
+bash
+Copy code
+git checkout mast-branch
+Update branch with latest main:
+
+
+git pull origin main
+Commit & push changes:
+
+
+git add .
+git commit -m "Your message"
+git push origin mast-branch
+Create PR on GitHub (base = main, compare = your branch) for review.
+
+Key Components
+Component	Description
+Navbar.jsx	Top navigation bar with responsive toggle
+HeroSection.jsx	Landing section introducing the platform
+HowItWorks.jsx	Step-by-step process explanation
+Footer.jsx	Contact & social links section
+App.jsx	Root wrapper connecting all pages
+
+Sample Flows (PowerShell)
+Start dev server and open app:
+
+
+cd Tana_teachings/frontend
+npm run dev
+Start-Process "http://localhost:5173/"
+
+
+
+Troubleshooting
+
+
+npm install errors: ensure Node.js & npm are installed and network is stable.
+
+Dev server not starting: check port 5173 is free.
+
+Styling issues: rebuild Tailwind cache with npx tailwindcss -o ./dist/output.css --watch.
+
+
+
+
+© 2025 Tana Teachings — All Rights Reserved.
+
+```
