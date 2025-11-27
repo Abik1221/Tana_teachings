@@ -1,57 +1,43 @@
-import express from "express";
-import cors from "cors";
-import helmet from "helmet";
-import rateLimit from "express-rate-limit";
-import connectDB from "./config/database.js";
-import env from "./config/environment.js";
-import authRoutes from "./routes/authRoutes.js";
-import errorHandler from "./middleware/errorMiddleware.js";
+import app from "./app.js";
+import database from "./config/database.js";
+import { PORT, NODE_ENV } from "./config/environment.js";
+import logger from "./utils/logger.js";
 
-
-await connectDB();
-
-const app = express();
-
-app.use(helmet());
-
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
-  message: "Too many requests from this IP, please try again later.",
-});
-app.use("/api", limiter);
-
-app.use(
-  cors({
-    origin: env.clientUrl,
-  })
-);
-
-app.use(express.json({ limit: "10mb" }));
-
-app.use("/api/auth", authRoutes);
-
-app.get("/api/health", (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: "Server is running",
-    timestamp: new Date().toISOString(),
-  });
+// Handle uncaught exceptions
+process.on("uncaughtException", (error) => {
+  logger.error("UNCAUGHT EXCEPTION! 💥 Shutting down...", error);
+  process.exit(1);
 });
 
-app.use(errorHandler);
+// Start server
+const startServer = async () => {
+  try {
+    await database.connect();
 
+    const server = app.listen(PORT, () => {
+      logger.info(`🚀 Server running in ${NODE_ENV} mode on port ${PORT}`);
+    });
 
-// Catch-all 404 handler
-app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    message: `Route ${req.originalUrl} not found`,
-  });
-});
+    // Handle unhandled promise rejections
+    process.on("unhandledRejection", (error) => {
+      logger.error("UNHANDLED REJECTION! 💥 Shutting down...", error);
+      server.close(() => {
+        process.exit(1);
+      });
+    });
 
-const PORT = env.port || 5000;
+    // Graceful shutdown
+    process.on("SIGTERM", () => {
+      logger.info("👋 SIGTERM RECEIVED. Shutting down gracefully");
+      server.close(() => {
+        database.disconnect();
+        logger.info("💥 Process terminated");
+      });
+    });
+  } catch (error) {
+    logger.error("Failed to start server:", error);
+    process.exit(1);
+  }
+};
 
-app.listen(PORT, () => {
-  console.log(`Server running in ${env.env} mode on port ${PORT}`);
-});
+startServer();
