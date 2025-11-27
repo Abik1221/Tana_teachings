@@ -1,36 +1,64 @@
-import Joi from "joi";
 import dotenv from "dotenv";
-dotenv.config(); 
+import { cleanEnv, str, port, num, url } from "envalid";
 
-const envVarsSchema = Joi.object({
-  NODE_ENV: Joi.string()
-    .valid("development", "production", "test")
-    .default("development"),
-  PORT: Joi.number().default(5000),
-  MONGODB_URI: Joi.string().required(),
-  JWT_SECRET: Joi.string().required(),
-  JWT_EXPIRE: Joi.string().default("30d"),
-//   CLIENT_URL: Joi.string().default("http://localhost:3000"),
-})
-  .unknown()
-  .required();
+// Load .env file
+dotenv.config();
 
-const { value: envVars, error } = envVarsSchema.validate(process.env);
+// Validate and clean environment variables
+const env = cleanEnv(process.env, {
+  NODE_ENV: str({
+    choices: ["development", "production", "test"],
+    default: "development",
+  }),
+  PORT: port({ default: 5000 }),
+  
+  // Changed to MONGO_URI to match standard database.js conventions
+  // Changed localhost to 127.0.0.1 to avoid Node 17+ IPv6 issues
+  MONGODB_URI: url({
+    devDefault: "mongodb://127.0.0.1:27017/mentorship_platform",
+    desc: "MongoDB Connection String",
+  }),
 
-if (error) {
-  throw new Error(`Config validation error: ${error.message}`);
-}
+  // JWT Configuration
+  JWT_SECRET: str({
+    devDefault: "fallback-secret-change-in-production",
+    desc: "Secret key for signing Access Tokens",
+  }),
+  JWT_REFRESH_SECRET: str({
+    devDefault: "fallback-refresh-secret-change-in-production",
+    desc: "Secret key for signing Refresh Tokens",
+  }),
+  JWT_EXPIRES_IN: str({ 
+    default: "15m",
+    desc: "Access token lifespan (e.g. 15m, 1h)" 
+  }),
+  JWT_REFRESH_EXPIRES_IN: str({ 
+    default: "30d",
+    desc: "Refresh token lifespan (e.g. 7d, 30d)"
+  }),
+  JWT_COOKIE_EXPIRES_IN: num({ 
+    default: 7,
+    desc: "Cookie expiration in days" 
+  }),
 
-export default {
-  env: envVars.NODE_ENV,
-  port: envVars.PORT,
-  mongoose: {
-    url: envVars.MONGODB_URI,
-    options: {},
-  },
-  jwt: {
-    secret: envVars.JWT_SECRET,
-    expire: envVars.JWT_EXPIRE,
-  },
-  clientUrl: envVars.CLIENT_URL,
-};
+  // Security & Client
+  BCRYPT_ROUNDS: num({ default: 12 }),
+  CLIENT_URL: url({ 
+    default: "http://localhost:3000",
+    desc: "Frontend URL for CORS configuration"
+  }),
+});
+
+// Export authenticated variables
+export const {
+  NODE_ENV,
+  PORT,
+  MONGODB_URI,
+  JWT_SECRET,
+  JWT_REFRESH_SECRET,
+  JWT_EXPIRES_IN,
+  JWT_REFRESH_EXPIRES_IN,
+  JWT_COOKIE_EXPIRES_IN,
+  BCRYPT_ROUNDS,
+  CLIENT_URL,
+} = env;
