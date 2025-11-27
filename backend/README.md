@@ -66,10 +66,6 @@ This is a **three-sided mentorship platform** that facilitates meaningful educat
 - **User Management**: View, suspend, and manage all users
 - **Reporting**: Registration trends, mentor performance, platform growth
 
-### 💰 Commission System
-- Automated commission calculation (15% platform fee)
-- Payment tracking and transaction history
-- Financial reporting and analytics
 
 ## 🛠 Tech Stack
 
@@ -85,24 +81,25 @@ This is a **three-sided mentorship platform** that facilitates meaningful educat
 ### Development
 - **Environment Management**: dotenv
 - **Code Quality**: ESLint, Prettier
-- **Testing**: Jest, Supertest
+- **Testing**: Insomnia
 - **Documentation**: API Documentation
 
 ## 🏗 Architecture
 
 ### Folder Structure
-
+```
 backend/
-├── 📁 config/ # Configuration files
-├── 📁 models/ # MongoDB schemas
-├── 📁 middleware/ # Authentication, validation, error handling
-├── 📁 controllers/ # Request handlers
-├── 📁 services/ # Business logic layer
-├── 📁 routes/ # API endpoints
-├── 📁 utils/ # Helpers, constants, validators
-├── 📁 tests/ # Test suites
-└── server.js # Application entry point
+|-- config/          # Configuration files
+|-- models/          # MongoDB schemas
+|-- middleware/      # Authentication, validation, error handling
+|-- controllers/     # Request handlers
+|-- services/        # Business logic layer
+|-- routes/          # API endpoints
+|-- utils/           # Helpers, constants, validators
+|-- tests/           # Test suites
+`-- server.js        # Application entry point
 
+```
 
 ### Database Design
 
@@ -141,7 +138,7 @@ User → Family → Student → Job → Application → Match → Session → Pr
         ```bash
         http://localhost:5000/api
         
-        ```
+       
 
 
 ## Authentication Endpoints
@@ -151,6 +148,7 @@ User → Family → Student → Job → Application → Match → Session → Pr
 | POST   | /auth/register | Register new user | Public  |
 | POST   | /auth/login    | User login        | Public  |
 | GET    | /auth/me       | Get current user  | Private |
+| POST    | /auth/logout       |  user logout | Private |
 
 ---
 
