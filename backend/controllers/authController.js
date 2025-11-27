@@ -1,70 +1,81 @@
-import User from "../models/User.js";
-import AppError from "../utils/AppError.js";
-import { sendTokenResponse } from "../utils/helpers.js";
-import {
-  registerValidation,
-  loginValidation,
-} from "../validations/authValidation.js";
+import { AuthService } from '../services/auth/authService.js';
+import { StatusCodes } from 'http-status-codes';
+import logger from '../utils/logger.js';
 
-export const register = async (req, res, next) => {
-  try {
-    const { error, value } = registerValidation.validate(req.body);
-    if (error) {
-      return next(new AppError(error.details[0].message, 400));
+export class AuthController {
+  static async register(req, res, next) {
+    try {
+      const userData = req.validatedData;
+      const result = await AuthService.register(userData);
+
+      logger.info(`New ${userData.role} registered: ${userData.email}`);
+
+      res.status(StatusCodes.CREATED).json({
+        success: true,
+        message:
+          `${userData.role.charAt(0).toUpperCase() + userData.role.slice(1)} registered successfully`,
+        data: result,
+      });
+    } catch (error) {
+      next(error);
     }
-
-    const { email, password, role, profile } = value;
-
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return next(new AppError("User already exists with this email", 409));
-    }
-
-    const user = await User.create({
-      email,
-      password,
-      role,
-      profile,
-    });
-
-    sendTokenResponse(user, 201, res, "User registered successfully");
-  } catch (error) {
-    next(error);
   }
-};
 
-export const login = async (req, res, next) => {
-  try {
-    const { error, value } = loginValidation.validate(req.body);
-    if (error) {
-      return next(new AppError(error.details[0].message, 400));
+  static async login(req, res, next) {
+    try {
+      const { email, password } = req.validatedData;
+      const result = await AuthService.login(email, password);
+
+      logger.info(`User logged in: ${email}`);
+
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: 'Login successful',
+        data: result,
+      });
+    } catch (error) {
+      next(error);
     }
+  }
 
-    const { email, password } = value;
+  static async getMe(req, res, next) {
+    try {
+      const user = await AuthService.getUserWithProfile(req.user.id);
 
-    const user = await User.findOne({ email, isActive: true }).select(
-      "+password"
-    );
-
-    if (!user || !(await user.correctPassword(password, user.password))) {
-      return next(new AppError("Invalid email or password", 401));
+      res.status(StatusCodes.OK).json({
+        success: true,
+        data: { user },
+      });
+    } catch (error) {
+      next(error);
     }
-
-    sendTokenResponse(user, 200, res, "Login successful");
-  } catch (error) {
-    next(new AppError(error.message, 401));
   }
-};
 
-export const getMe = async (req, res, next) => {
-  try {
-    const user = await User.findById(req.user.id);
-    res.status(200).json({
-      success: true,
-      message: "User retrieved successfully",
-      data: { user },
-    });
-  } catch (error) {
-    next(error);
+  static async updateProfile(req, res, next) {
+    try {
+      const userId = req.user.id;
+      const updateData = req.validatedData; // <-- safer than req.body
+
+      const updatedUser = await AuthService.updateProfile(userId, updateData);
+
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: "Profile updated successfully",
+        data: updatedUser,
+      });
+    } catch (error) {
+      next(error);
+    }
   }
-};
+
+  static async logout(req, res, next) {
+    try {
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: 'Logout successful',
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+}
