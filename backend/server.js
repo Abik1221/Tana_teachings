@@ -3,6 +3,10 @@ import database from "./config/database.js";
 import { PORT, NODE_ENV } from "./config/environment.js";
 import logger from "./utils/logger.js";
 
+const familyRoutes = require('./routes/family');
+
+app.use('/api/families', familyRoutes);
+
 // Handle uncaught exceptions
 process.on("uncaughtException", (error) => {
   logger.error("UNCAUGHT EXCEPTION! 💥 Shutting down...", error);

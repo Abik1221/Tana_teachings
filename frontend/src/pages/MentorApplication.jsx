@@ -135,9 +135,9 @@ const MentorApplication = () => {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-blue-50 to-purple-50 flex items-center justify-center py-12 px-4">
+      <div className="min-h-screen bg-linear-to-br from-emerald-50 via-blue-50 to-purple-50 flex items-center justify-center py-12 px-4">
         <div className="max-w-md w-full bg-white rounded-3xl shadow-2xl p-10 text-center border border-emerald-100">
-          <div className="w-24 h-24 bg-gradient-to-r from-emerald-400 to-cyan-500 rounded-full flex items-center justify-center text-4xl mx-auto mb-8 shadow-lg">
+          <div className="w-24 h-24 bg-linear-to-r from-emerald-400 to-cyan-500 rounded-full flex items-center justify-center text-4xl mx-auto mb-8 shadow-lg">
             🎉
           </div>
           <h1 className="text-4xl font-bold text-gray-800 mb-6 leading-tight">
@@ -152,7 +152,7 @@ const MentorApplication = () => {
             </p>
           </div>
           <button 
-            className="w-full bg-gradient-to-r from-emerald-500 to-cyan-600 hover:from-emerald-600 hover:to-cyan-700 text-white font-bold py-4 px-8 rounded-xl transition-all duration-300"
+            className="w-full bg-linear-to-r from-emerald-500 to-cyan-600 hover:from-emerald-600 hover:to-cyan-700 text-white font-bold py-4 px-8 rounded-xl transition-all duration-300"
             onClick={() => {
               setSubmitted(false)
               setCurrentStep(1)
@@ -174,14 +174,14 @@ const MentorApplication = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 py-12 px-4">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50 to-indigo-100 py-12 px-4">
       <div className="max-w-5xl mx-auto">
         {/* Header Section */}
         <div className="text-center mb-16">
-          <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mb-8 shadow-xl">
+          <div className="inline-flex items-center justify-center w-24 h-24 bg-linear-to-r from-blue-500 to-purple-600 rounded-full mb-8 shadow-xl">
             <span className="text-3xl text-white">👨‍🏫</span>
           </div>
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-6 leading-snug">
+          <h1 className="text-5xl font-bold bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-6 leading-snug">
             Join Our Mentor Community
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
@@ -191,7 +191,7 @@ const MentorApplication = () => {
 
         <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
           {/* Progress Bar */}
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 px-10 py-8">
+          <div className="bg-linear-to-r from-blue-600 to-purple-600 px-10 py-8">
             <div className="flex items-center justify-between max-w-7xl mx-auto">
               {[1, 2, 3, 4].map((step) => (
                 <div key={step} className="flex items-center">
@@ -230,12 +230,12 @@ const MentorApplication = () => {
                   <div className="text-center mb-12">
                     <h2 className="text-4xl font-bold text-gray-800 mb-4 leading-tight">Personal Information</h2>
                     <p className="text-lg text-gray-600 mb-6">Tell us about yourself</p>
-                    <div className="w-32 h-1.5 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full mx-auto"></div>
+                    <div className="w-32 h-1.5 bg-linear-to-r from-blue-500 to-purple-500 rounded-full mx-auto"></div>
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div className="space-y-4">
-                      <label className="block text-base font-semibold text-gray-700 mb-3 flex items-center">
+                      <label className="block text-base font-semibold text-gray-700 mb-3 items-center">
                         <span className="w-3 h-3 bg-blue-500 rounded-full mr-3"></span>
                         Full Name *
                       </label>
@@ -253,7 +253,7 @@ const MentorApplication = () => {
                       {errors.fullName && <p className="text-red-500 text-sm mt-2">{errors.fullName}</p>}
                     </div>
                     <div className="space-y-4">
-                      <label className="block text-base font-semibold text-gray-700 mb-3 flex items-center">
+                      <label className="block text-base font-semibold text-gray-700 mb-3 items-center">
                         <span className="w-3 h-3 bg-blue-500 rounded-full mr-3"></span>
                         Email Address *
                       </label>
@@ -271,7 +271,7 @@ const MentorApplication = () => {
                       {errors.email && <p className="text-red-500 text-sm mt-2">{errors.email}</p>}
                     </div>
                     <div className="space-y-4">
-                      <label className="block text-base font-semibold text-gray-700 mb-3 flex items-center">
+                      <label className="block text-base font-semibold text-gray-700 mb-3 items-center">
                         <span className="w-3 h-3 bg-blue-500 rounded-full mr-3"></span>
                         Phone Number *
                       </label>
@@ -289,7 +289,7 @@ const MentorApplication = () => {
                       {errors.phone && <p className="text-red-500 text-sm mt-2">{errors.phone}</p>}
                     </div>
                     <div className="space-y-4">
-                      <label className="block text-base font-semibold text-gray-700 mb-3 flex items-center">
+                      <label className="block text-base font-semibold text-gray-700 mb-3 items-center">
                         <span className="w-3 h-3 bg-green-500 rounded-full mr-3"></span>
                         Address
                       </label>
@@ -303,7 +303,7 @@ const MentorApplication = () => {
                       />
                     </div>
                     <div className="space-y-4">
-                      <label className="block text-base font-semibold text-gray-700 mb-3 flex items-center">
+                      <label className="block text-base font-semibold text-gray-700 mb-3 items-center">
                         <span className="w-3 h-3 bg-green-500 rounded-full mr-3"></span>
                         City
                       </label>
@@ -317,7 +317,7 @@ const MentorApplication = () => {
                       />
                     </div>
                     <div className="space-y-4">
-                      <label className="block text-base font-semibold text-gray-700 mb-3 flex items-center">
+                      <label className="block text-base font-semibold text-gray-700 mb-3 items-center">
                         <span className="w-3 h-3 bg-green-500 rounded-full mr-3"></span>
                         Country
                       </label>
@@ -335,7 +335,7 @@ const MentorApplication = () => {
                     <button 
                       type="button" 
                       onClick={nextStep}
-                      className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-5 px-12 rounded-2xl transition-all duration-300 text-lg flex items-center space-x-3 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="bg-linear-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-5 px-12 rounded-2xl transition-all duration-300 text-lg flex items-center space-x-3 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
                       disabled={!formData.fullName || !formData.email || !formData.phone}
                     >
                       <span>Continue to Education</span>

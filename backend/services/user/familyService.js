@@ -1,4 +1,4 @@
-import Family from "../../models/Family.js";
+import Family from "../../models/family.js";
 import User from "../../models/User.js";
 import AppError from "../../utils/errors/AppError.js";
 import { StatusCodes } from "http-status-codes";
