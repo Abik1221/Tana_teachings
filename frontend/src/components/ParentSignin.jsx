@@ -80,7 +80,6 @@ const ParentSignin = () => {
             Welcome back! Sign in to manage your family account.
           </p>
         </div>
-
         {/* Email/Password Form */}
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="relative">
@@ -125,7 +124,6 @@ const ParentSignin = () => {
             Sign In with Email
           </button>
         </form>
-
         {/* Divider */}
         <div className="flex items-center my-5">
           <div className="flex-grow h-px bg-gray-300"></div>
@@ -140,7 +138,6 @@ const ParentSignin = () => {
             onError={() => showError("Google login failed")}
           />
         </div>
-
         {/* Auth Footer */}
         <div className="text-center mt-5 text-sm text-gray-600">
           <p>
