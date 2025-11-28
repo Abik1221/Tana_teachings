@@ -2,10 +2,6 @@
 
 Professional, responsive, and scalable frontend for the **Tana Teachings** platform, built with **React (Vite)**, **Tailwind CSS**, and reusable components for clean UI and fast development.
 
-For a deeper architecture and component reference, see DOCS.md.
-
----
-
 ## Features
 
 - Fully responsive layout (desktop & mobile)
@@ -13,8 +9,6 @@ For a deeper architecture and component reference, see DOCS.md.
 - Reusable components structure (Navbar, HeroSection, HowItWorks, Footer)
 - Organized folder system for scalability
 - Integration-ready setup for backend APIs
-
----
 
 ## Quickstart (Local)
 
@@ -45,8 +39,7 @@ npm run preview	Preview production build locally
 Development Workflow
 Work on your branch only:
 
-bash
-Copy code
+
 git checkout mast-branch
 Update branch with latest main:
 
@@ -75,21 +68,12 @@ Start dev server and open app:
 cd Tana_teachings/frontend
 npm run dev
 Start-Process "http://localhost:5173/"
-
-
-
 Troubleshooting
-
-
 npm install errors: ensure Node.js & npm are installed and network is stable.
 
 Dev server not starting: check port 5173 is free.
 
 Styling issues: rebuild Tailwind cache with npx tailwindcss -o ./dist/output.css --watch.
 
-
-
-
 © 2025 Tana Teachings — All Rights Reserved.
-
 ```
