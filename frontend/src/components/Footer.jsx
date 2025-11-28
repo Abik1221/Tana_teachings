@@ -6,7 +6,7 @@ const Footer = () => {
     solution: [
       { name: "How It Works", href: "#how-it-works" },
       { name: "For Parents", href: "/parents" },
-      { name: "For Mentors", href: "/mentors" },
+      { name: "For Mentors", href: "/MentorApplication" },
       { name: "Vetting Process", href: "/vetting" },
     ],
     company: [
@@ -23,7 +23,7 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-blue-950 border-t border-gray-800">
+    <footer className="bg-blue-950 border-t border-gray-800 z-10">
       {/* 1. Main Call to Action (Kept from original design) */}
       <div className="relative py-16 sm:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
