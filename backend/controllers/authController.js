@@ -12,8 +12,7 @@ export class AuthController {
 
       res.status(StatusCodes.CREATED).json({
         success: true,
-        message:
-          `${userData.role.charAt(0).toUpperCase() + userData.role.slice(1)} registered successfully`,
+        message: `${userData.role.charAt(0).toUpperCase() + userData.role.slice(1)} registered successfully`,
         data: result,
       });
     } catch (error) {
@@ -54,7 +53,7 @@ export class AuthController {
   static async updateProfile(req, res, next) {
     try {
       const userId = req.user.id;
-      const updateData = req.validatedData; // <-- safer than req.body
+      const updateData = req.validatedData;
 
       const updatedUser = await AuthService.updateProfile(userId, updateData);
 
@@ -62,6 +61,24 @@ export class AuthController {
         success: true,
         message: "Profile updated successfully",
         data: updatedUser,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async createProfile(req, res, next) {
+    try {
+      const userId = req.user.id;
+      const profileData = req.validatedData;
+      const userRole = req.user.role;
+
+      const result = await AuthService.createRoleProfile(userId, userRole, profileData);
+
+      res.status(StatusCodes.CREATED).json({
+        success: true,
+        message: `${userRole} profile created successfully`,
+        data: result,
       });
     } catch (error) {
       next(error);

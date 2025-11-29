@@ -1,5 +1,5 @@
 import { AdminJobService } from '../../services/admin/adminJobService.js';
-import  catchAsync from '../../utils/errors/catchAsync.js';
+import  {catchAsync} from '../../utils/errors/catchAsync.js';
 
 export const adminJobController = {
   /**
