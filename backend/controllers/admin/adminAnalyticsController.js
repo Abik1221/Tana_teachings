@@ -1,4 +1,4 @@
-import  catchAsync  from '../../utils/errors/catchAsync.js';
+import  {catchAsync}  from '../../utils/errors/catchAsync.js';
 import { AdminAnalyticsService } from '../../services/admin/adminAnalyticsService.js';
 
 export const adminAnalyticsController = {
