@@ -4,206 +4,318 @@ A comprehensive backend system for a mentorship platform connecting students, me
 
 ## 📋 Table of Contents
 
-- [Overview](#overview)
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Architecture](#architecture)
-- [Installation](#installation)
-- [API Documentation](#api-documentation)
-- [Environment Variables](#environment-variables)
-- [Project Structure](#project-structure)
-- [Admin Features](#admin-features)
-- [Authentication](#authentication)
-- [Database Models](#database-models)
-- [Development](#development)
-- [Deployment](#deployment)
+* [Overview](#overview)
+* [Features](#features)
+* [Tech Stack](#tech-stack)
+* [Architecture](#architecture)
+* [Installation](#installation)
+* [API Documentation](#api-documentation)
+* [Environment Variables](#environment-variables)
+* [Project Structure](#project-structure)
+* [Authentication](#authentication)
+* [Role-Based Permissions](#role-based-permissions)
+* [Routes](#routes)
+* [Admin Features](#admin-features)
+* [Database Models](#database-models)
+* [Development](#development)
+* [Deployment](#deployment)
+
+---
 
 ## 🚀 Overview
 
-This is a **three-sided mentorship platform** that facilitates meaningful educational relationships between:
-- **Students** seeking academic guidance
-- **Mentors** offering tutoring services  
-- **Families** managing student profiles and mentorship requests
-- **Admins** overseeing platform quality and operations
+This is a **three-sided mentorship platform** that connects:
 
-### Core Problem We Solve
+* **Students** looking for academic support
+* **Mentors** providing learning assistance
+* **Families** managing student profiles
+* **Admins** ensuring platform operations
 
-1. **Students Struggle** to find reliable, qualified mentors
-2. **Parents Waste Time** searching through unvetted tutors
-3. **Mentors Lack Access** to serious, committed students
-4. **No Centralized System** for structured matching with oversight
+The backend provides a secure, scalable API built with Express.js and MongoDB.
+
+---
 
 ## ✨ Features
 
 ### 🔐 Authentication & Authorization
-- JWT-based authentication with refresh tokens
-- Role-based access control (Admin, Mentor, Family, Student)
-- Secure password hashing with bcrypt
-- Email verification system
+
+* JWT login + refresh tokens
+* Role-based access (Admin, Mentor, Student, Family)
+* Secure password hashing
+* Profile completion workflow per role
 
 ### 👥 User Management
-- Multi-role user system
-- Profile management for each role
-- User status management (active, suspended, inactive)
-- Comprehensive user analytics
+
+* Multi-role users with shared base profile
+* Extended profiles per role
+* Admin full user control
 
 ### 📋 Job Posting System
-- Family-initiated mentorship requests
-- Admin approval workflow for job posts
-- Advanced filtering and search capabilities
-- Budget and scheduling management
 
-### 📝 Application & Vetting
-- Mentor applications with detailed proposals
-- Double-vetting system (Admin → Family)
-- Application status tracking
-- Quality control mechanisms
+* Families post tutoring needs
+* Admin approval workflow
+* Filtering & search
+
+### 📝 Mentor Applications
+
+* Mentors submit proposals
+* Admin vetting & family review
 
 ### ⚡ Admin Dashboard
-- **Platform Analytics**: User statistics, growth metrics, performance insights
-- **Job Management**: Approve/reject posts, set priorities, track status
-- **Application Vetting**: Review, shortlist, and reject mentor applications
-- **User Management**: View, suspend, and manage all users
-- **Reporting**: Registration trends, mentor performance, platform growth
 
-### 💰 Commission System
-- Automated commission calculation (15% platform fee)
-- Payment tracking and transaction history
-- Financial reporting and analytics
+* Analytics
+* User management
+* Job + application vetting
+* Performance insights
+
+---
 
 ## 🛠 Tech Stack
 
-### Backend
-- **Runtime**: Node.js
-- **Framework**: Express.js
-- **Database**: MongoDB with Mongoose
-- **Authentication**: JWT + bcrypt
-- **Validation**: Joi
-- **Security**: Helmet, CORS, Rate Limiting
-- **Logging**: Winston/Morgan
+* **Node.js**, **Express.js**
+* **MongoDB + Mongoose**
+* **JWT Authentication**
+* **Joi Validation**
+* **Winston Logging**
 
-### Development
-- **Environment Management**: dotenv
-- **Code Quality**: ESLint, Prettier
-- **Testing**: Jest, Supertest
-- **Documentation**: API Documentation
+---
 
 ## 🏗 Architecture
 
-### Folder Structure
-
+```
 backend/
-├── 📁 config/ # Configuration files
-├── 📁 models/ # MongoDB schemas
-├── 📁 middleware/ # Authentication, validation, error handling
-├── 📁 controllers/ # Request handlers
-├── 📁 services/ # Business logic layer
-├── 📁 routes/ # API endpoints
-├── 📁 utils/ # Helpers, constants, validators
-├── 📁 tests/ # Test suites
-└── server.js # Application entry point
-
+|-- config/
+|-- models/
+|-- middleware/
+|-- controllers/
+|-- services/
+|-- routes/
+|-- utils/
+|-- logs/
+`-- server.js
+```
 
 ### Database Design
 
 User → Family → Student → Job → Application → Match → Session → Progress → Payment
 
-
+---
 
 ## ⚙️ Installation
 
 ### Prerequisites
-- Node.js (v16 or higher)
-- MongoDB (v4.4 or higher)
-- npm or yarn
 
-### Setup Instructions
+* Node.js v16+
+* MongoDB
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd mentorship-platform/backend
+### Setup
 
-2. **Install dependencies**
-    ```bash
-    npm install
-
-3. **Start the application**
-
-    ```bash
-    # Development
-    npm run dev
-
-#  📚 API Documentation
-
-**Base URL**
-
-        ```bash
-        http://localhost:5000/api
-        
-        ```
-
-
-## Authentication Endpoints
-
-| Method | Endpoint       | Description       | Access  |
-|--------|----------------|-----------------|---------|
-| POST   | /auth/register | Register new user | Public  |
-| POST   | /auth/login    | User login        | Public  |
-| GET    | /auth/me       | Get current user  | Private |
+```bash
+git clone <repo-url>
+cd backend
+npm install
+npm run dev
+```
 
 ---
 
-## Admin Endpoints
+## 🔐 Authentication
+
+### Endpoints
+
+| Method | Endpoint              | Description              |
+| ------ | --------------------- | ------------------------ |
+| POST   | /auth/register        | Register new base user   |
+| POST   | /auth/login           | Login                    |
+| GET    | /auth/me              | Get logged-in user       |
+| POST   | /auth/logout          | Logout                   |
+| POST   | /auth/profile/family  | Complete family profile  |
+| POST   | /auth/profile/student | Complete student profile |
+| POST   | /auth/profile/mentor  | Complete mentor profile  |
+| PUT    | /auth/profile         | Update common fields     |
+
+---
+
+## 🛡 Role-Based Permissions
+
+| Role    | Access                           |
+| ------- | -------------------------------- |
+| Admin   | Full system access               |
+| Family  | Manage students + jobs           |
+| Student | View mentors, sessions           |
+| Mentor  | Apply for jobs, manage proposals |
+
+---
+
+## 🛣 Routes
+
+### Base Router (`routes/index.js`)
+
+```
+/api/health
+/api/auth
+/api/users
+/api/mentors
+/api/admin
+```
+
+### Auth Routes (`auth.routes.js`)
+
+* register
+* login
+* logout
+* profile creation per role
+* profile update
+
+### User Routes (`user.routes.js`)
+
+* update common profile fields
+
+### Mentor Routes (`mentor.routes.js`)
+
+(Role-specific mentor endpoints can extend this.)
+
+### Admin Routes (`admin.routes.js`)
+
+Admin-only protected endpoints:
+
+* Dashboard stats
+* User management
+* Job management
+* Application vetting
+* Reports
+
+---
+
+## 🧭 Admin Features
 
 ### Dashboard & Analytics
 
-| Method | Endpoint                         | Description                  |
-|--------|---------------------------------|------------------------------|
-| GET    | /admin/dashboard/overview        | Platform overview metrics    |
-| GET    | /admin/stats/platform            | Platform statistics          |
-| GET    | /admin/stats/jobs                | Job statistics               |
-| GET    | /admin/stats/applications        | Application statistics       |
+* /admin/dashboard/overview
+* /admin/stats/platform
+* /admin/stats/jobs
+* /admin/stats/applications
 
 ### User Management
 
-| Method | Endpoint                     | Description                        |
-|--------|------------------------------|------------------------------------|
-| GET    | /admin/users                 | Get all users (with filtering)     |
-| GET    | /admin/users/:id             | Get user by ID                     |
-| PATCH  | /admin/users/:id/status      | Update user status                 |
-| DELETE | /admin/users/:id             | Delete user (soft delete)          |
-| GET    | /admin/users/:id/profile     | Get user profile with role data    |
+* List users
+* Get single user
+* Update status
+* Soft delete user
+* Fetch profile by ID
 
 ### Job Management
 
-| Method | Endpoint                     | Description                        |
-|--------|------------------------------|------------------------------------|
-| GET    | /admin/jobs                  | Get all jobs (with filtering)      |
-| GET    | /admin/jobs/pending          | Get pending approval jobs          |
-| PUT    | /admin/jobs/:id/approve      | Approve job post                    |
-| PUT    | /admin/jobs/:id/reject       | Reject job post                     |
-| PATCH  | /admin/jobs/:id/priority     | Update job priority                 |
+* Approve job
+* Reject job
+* Set job priority
+* Get pending jobs
 
 ### Application Vetting
 
-| Method | Endpoint                          | Description                          |
-|--------|----------------------------------|--------------------------------------|
-| GET    | /admin/applications              | Get all applications                  |
-| GET    | /admin/applications/pending      | Get pending vetting applications     |
-| PUT    | /admin/applications/:id/vet      | Vet application (shortlist/reject)   |
-| GET    | /admin/applications/job/:jobId   | Get applications for specific job    |
+* Get pending applications
+* Vet / shortlist
+* View job applications
+
+### Reports
+
+* Registration trends
+* Mentor performance
+* Platform growth
 
 ---
 
-## Environment Variables
+## 🌱 Development
 
-| Variable                | Description                   | Default                     |
-|-------------------------|-------------------------------|-----------------------------|
-| NODE_ENV                | Application environment       | development                 |
-| PORT                    | Server port                   | 5000                        |
-| MONGODB_URI             | MongoDB connection string     | -                           |
-| JWT_SECRET              | JWT signing secret            | -                           |
-| JWT_EXPIRES_IN          | JWT expiration time           | 7d                          |
-| JWT_REFRESH_SECRET      | Refresh token secret          | -                           |
-| JWT_REFRESH_EXPIRES_IN  | Refresh token expiration      | 30d                         |
+### Running Dev Server
+
+```bash
+npm run dev
+```
+
+### Code Style Tools
+
+* ESLint
+* Prettier
+
+---
+
+## 🚀 Deployment
+
+Supported on:
+
+* Docker
+* Railway
+* Render
+* AWS Elastic Beanstalk
+
+Environment variables must be configured before deployment.
+
+---
+
+## 🔧 Environment Variables
+
+| Variable               | Description        |
+| ---------------------- | ------------------ |
+| PORT                   | Server port        |
+| MONGODB_URI            | DB connection URI  |
+| JWT_SECRET             | JWT key            |
+| JWT_EXPIRES_IN         | Expiration         |
+| JWT_REFRESH_SECRET     | Refresh key        |
+| JWT_REFRESH_EXPIRES_IN | Refresh expiration |
+
+---
+
+## 📌 Notes
+
+* All admin routes require both **authenticate** and **restrictTo(ADMIN)** middleware.
+* Profile completion must happen after registration and login.
+* User collection stores base identity; each role has separate model.
+
+---
+
+
+
+## API Routes
+
+### Auth Routes
+
+* **POST** `/api/auth/register`
+* **POST** `/api/auth/login`
+* **POST** `/api/auth/refresh-token`
+* **POST** `/api/auth/forgot-password`
+* **POST** `/api/auth/reset-password`
+
+### Mentor Routes
+
+* **GET** `/api/mentor/profile`
+* **PUT** `/api/mentor/profile`
+* **GET** `/api/mentor/jobs`
+* **POST** `/api/mentor/jobs/apply`
+* **GET** `/api/mentor/sessions`
+* **POST** `/api/mentor/sessions`
+
+### Student Routes
+
+* **GET** `/api/student/profile`
+* **PUT** `/api/student/profile`
+* **GET** `/api/student/applications`
+* **POST** `/api/student/apply`
+* **GET** `/api/student/saved-jobs`
+* **POST** `/api/student/saved-jobs`
+
+### Family Routes
+
+* **GET** `/api/family/profile`
+* **PUT** `/api/family/profile`
+* **GET** `/api/family/students`
+
+### Admin Routes
+
+* **GET** `/api/admin/users`
+* **POST** `/api/admin/users`
+* **GET** `/api/admin/jobs`
+* **POST** `/api/admin/jobs`
+* **GET** `/api/admin/applications`
+* **GET** `/api/admin/analytics`
+

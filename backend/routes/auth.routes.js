@@ -1,27 +1,31 @@
 import express from 'express';
 import { AuthController } from '../controllers/authController.js';
-import { authenticate } from '../middleware/auth/authenticate.js';
-import { authLimiter } from '../middleware/security/rateLimiting.js';
 import { 
   validateRegistration, 
-  validateLogin 
+  validateLogin,
+  validateFamilyProfile,
+  validateStudentProfile, 
+  validateMentorProfile 
 } from '../middleware/validation/authValidation.js';
+import { authenticate } from '../middleware/auth/authenticate.js';
 
 const router = express.Router();
 
-// Public routes with Rate Limiting
-router.post('/register', authLimiter, validateRegistration, AuthController.register);
-router.post('/login', authLimiter, validateLogin, AuthController.login);
+// Public routes
+router.post('/register', validateRegistration, AuthController.register);
+router.post('/login', validateLogin, AuthController.login);
 
-// Future: Password Reset Flow
-// router.post('/forgot-password', validateForgotPassword, AuthController.forgotPassword);
-// router.post('/reset-password', validateResetPassword, AuthController.resetPassword);
+// Protected routes (require authentication)
+router.use(authenticate);
 
-// Protected routes
-router.use(authenticate); // All routes below require valid JWT
+// Profile completion routes (after login)
+router.post('/profile/family', validateFamilyProfile, AuthController.createProfile);
+router.post('/profile/student', validateStudentProfile, AuthController.createProfile);
+router.post('/profile/mentor', validateMentorProfile, AuthController.createProfile);
 
-router.post('/logout', AuthController.logout);
+// Common profile updates
+router.put('/profile', AuthController.updateProfile);
 router.get('/me', AuthController.getMe);
-// router.put('/change-password', validateChangePassword, AuthController.changePassword);
+router.post('/logout', AuthController.logout);
 
 export default router;

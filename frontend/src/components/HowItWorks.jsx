@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 // Icons using Lucide for visual appeal
 import {
   FileText,
@@ -134,12 +135,12 @@ const HowItWorks = () => {
 
         {/* Main CTA after the steps */}
         <div className="mt-20 flex justify-center">
-          <a
-            href="/signup"
+          <Link
+            to="/MentorApplication"
             className="inline-flex items-center px-8 py-4 border border-transparent text-lg font-semibold rounded-xl shadow-2xl text-white bg-indigo-600 hover:bg-indigo-700 transition duration-300 transform hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50"
           >
             Start Your Mentorship Journey
-          </a>
+          </Link>
         </div>
       </div>
     </section>

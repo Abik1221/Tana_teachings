@@ -84,7 +84,7 @@ const TestimonialsSection = () => {
         {/* Global Rating Snippet (Fictional Example) */}
         <div className="mt-16 text-center">
           <p className="text-gray-600 text-lg">
-            **Overall Platform Rating:**{" "}
+            Overall Platform Rating:{" "}
             <span className="font-bold text-gray-900 ml-2">4.9/5</span> based on
             <span className="text-indigo-600 font-medium ml-1">
               1,200+ Mentorships

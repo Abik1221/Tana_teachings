@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const HeroSection = () => {
   return (
@@ -24,12 +25,12 @@ const HeroSection = () => {
           mentorship relationships.
         </p>
 
-        <a
-          href="/signup/parent"
-          className="inline-block bg-orange-500 text-white text-lg font-bold px-8 sm:px-10 py-3 sm:py-4 rounded-lg hover:bg-orange-600 transition duration-300 shadow-xl transform hover:scale-105"
+        <Link
+          to="/MentorApplication"
+          className="inline-block bg-indigo-700 text-white text-lg font-bold px-8 sm:px-10 py-3 sm:py-4 rounded-lg hover:bg-indigo-800 transition duration-300 shadow-xl transform hover:scale-105"
         >
           Start Your Partnership
-        </a>
+        </Link>
       </div>
     </div>
   );

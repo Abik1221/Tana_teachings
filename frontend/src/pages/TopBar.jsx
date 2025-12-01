@@ -10,9 +10,9 @@ const TopBar = () => {
     setShowRoleSelector(false); // Close the selector
 
     if (role === "parent") {
-      navigate("/signup/parent");
+      navigate("/parent-signup");
     } else if (role === "mentor") {
-      navigate("/signup/mentor");
+      navigate("/MentorApplication");
     }
   };
 

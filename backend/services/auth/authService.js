@@ -8,15 +8,12 @@ import AppError from '../../utils/errors/AppError.js';
 import { StatusCodes } from 'http-status-codes';
 import { AUTH_ERRORS, ROLES } from '../../config/constants.js';
 
-export class AuthService {
-  /**
-   * Register a new user and create role-specific document
-   * Uses Manual Rollback (Try/Catch/Delete) to support standalone MongoDB
-   */
-  static async register(userData) {
-    const { name, email, password, role, phone, profileData } = userData;
 
-    // 1. Basic Validation
+export class AuthService {
+  static async register(userData) {
+    const { name, email, password, role, phone } = userData;
+
+    // 1. Basic Validation (COMMON DATA ONLY)
     if (!name || !email || !password || !role) {
       throw new AppError('Name, email, password, and role are required', StatusCodes.BAD_REQUEST);
     }
@@ -37,7 +34,7 @@ export class AuthService {
       throw new AppError(passwordError, StatusCodes.BAD_REQUEST);
     }
 
-    // 4. Create User (Common Data)
+    // 4. Create User (COMMON DATA ONLY - No profile data during registration)
     let user;
     try {
       user = await User.create({
@@ -54,57 +51,44 @@ export class AuthService {
       throw err;
     }
 
-    // 5. Create Role-Specific Document
+    // 5. Create EMPTY Role-Specific Document (Only user reference)
     let roleSpecificDoc;
 
     try {
       if (role === ROLES.FAMILY) {
-        if (!profileData?.familyName || !profileData?.address) {
-          throw new AppError('Family name and address are required', StatusCodes.BAD_REQUEST);
-        }
-
         roleSpecificDoc = await Family.create({
           user: user._id,
-          familyName: profileData.familyName.trim(),
-          contactPhone: profileData.contactPhone?.trim() || user.phone,
-          address: profileData.address,
-          preferredContactMethod: profileData.preferredContactMethod || 'email',
+          // Empty fields - will be filled later
+          familyName: '',
+          contactPhone: user.phone || '',
+          address: null,
+          preferredContactMethod: 'email'
         });
 
       } else if (role === ROLES.STUDENT) {
-        if (!profileData?.dateOfBirth || !profileData?.gradeLevel || !profileData?.familyId) {
-          throw new AppError('DOB, grade level, and family ID are required', StatusCodes.BAD_REQUEST);
-        }
-
-        const family = await Family.findById(profileData.familyId);
-        if (!family) {
-          throw new AppError('Family not found', StatusCodes.BAD_REQUEST);
-        }
-
         roleSpecificDoc = await Student.create({
           user: user._id,
-          family: profileData.familyId,
+          // Empty fields - will be filled later
+          family: null,
           name: user.name,
-          dateOfBirth: new Date(profileData.dateOfBirth),
-          gradeLevel: profileData.gradeLevel,
-          subjects: profileData.subjects || []
+          dateOfBirth: null,
+          gradeLevel: '',
+          subjects: []
         });
 
       } else if (role === ROLES.MENTOR) {
-        if (!profileData?.expertise || !Array.isArray(profileData.expertise) || profileData.expertise.length === 0) {
-          throw new AppError('At least one expertise area is required', StatusCodes.BAD_REQUEST);
-        }
-
+        // Create mentor with minimal required fields - expertise is now optional for initial creation
         roleSpecificDoc = await Mentor.create({
           user: user._id,
-          bio: profileData.bio?.trim() || '',
-          expertise: profileData.expertise,
-          qualifications: profileData.qualifications || [],
-          experience: profileData.experience || 0,
-          education: profileData.education || [],
-          hourlyRate: profileData.hourlyRate || 0,
-          availability: profileData.availability || [],
-          subjects: profileData.subjects || []
+          // Empty fields - will be filled later during profile completion
+          bio: '',
+          expertise: [], // Empty array is now allowed
+          qualifications: [],
+          experience: { years: 0, description: '' },
+          education: [],
+          hourlyRate: 0,
+          availability: [],
+          subjects: []
         });
       }
 
@@ -118,12 +102,197 @@ export class AuthService {
       };
 
     } catch (error) {
-      // MANUAL ROLLBACK: If profile creation fails, delete the User we just created
-      // This prevents "orphan" users who have no profile data
+      // Rollback: Delete user if profile creation fails
       await User.findByIdAndDelete(user._id);
-      
       throw error;
     }
+  }
+
+  /**
+   * Create role-specific profile after registration (for empty profiles)
+   */
+  static async createRoleProfile(userId, role, profileData) {
+    const user = await User.findById(userId);
+    if (!user) {
+      throw new AppError(AUTH_ERRORS.USER_NOT_FOUND, StatusCodes.NOT_FOUND);
+    }
+
+    let roleSpecificDoc;
+    let updateData = {};
+
+    switch (role) {
+      case ROLES.FAMILY:
+        if (!profileData.familyName || !profileData.address) {
+          throw new AppError('Family name and address are required', StatusCodes.BAD_REQUEST);
+        }
+        updateData = {
+          familyName: profileData.familyName.trim(),
+          contactPhone: profileData.contactPhone?.trim() || user.phone,
+          address: profileData.address,
+          preferredContactMethod: profileData.preferredContactMethod || 'email',
+          timezone: profileData.timezone || 'America/New_York'
+        };
+        roleSpecificDoc = await Family.findOneAndUpdate(
+          { user: userId },
+          { $set: updateData },
+          { new: true, runValidators: true }
+        );
+        break;
+
+      case ROLES.STUDENT:
+        if (!profileData.dateOfBirth || !profileData.gradeLevel || !profileData.familyId) {
+          throw new AppError('Date of birth, grade level, and family ID are required', StatusCodes.BAD_REQUEST);
+        }
+        updateData = {
+          family: profileData.familyId,
+          dateOfBirth: new Date(profileData.dateOfBirth),
+          gradeLevel: profileData.gradeLevel,
+          subjects: profileData.subjects || []
+        };
+        roleSpecificDoc = await Student.findOneAndUpdate(
+          { user: userId },
+          { $set: updateData },
+          { new: true, runValidators: true }
+        );
+        break;
+
+      case ROLES.MENTOR:
+        // VALIDATE: At least one expertise is required when completing profile
+        if (!profileData.expertise || !Array.isArray(profileData.expertise) || profileData.expertise.length === 0) {
+          throw new AppError('At least one expertise area is required', StatusCodes.BAD_REQUEST);
+        }
+
+        let safeExperience = { years: 0, description: '' };
+        if (profileData.experience !== undefined && profileData.experience !== null) {
+          if (typeof profileData.experience === 'number') {
+            safeExperience = { years: profileData.experience, description: '' };
+          } else if (typeof profileData.experience === 'object') {
+            safeExperience = profileData.experience;
+          }
+        }
+
+        updateData = {
+          bio: profileData.bio?.trim() || '',
+          expertise: profileData.expertise, // Now validated here
+          qualifications: profileData.qualifications || [],
+          experience: safeExperience,
+          education: profileData.education || [],
+          hourlyRate: profileData.hourlyRate || 0,
+          availability: profileData.availability || [],
+          subjects: profileData.subjects || []
+        };
+        roleSpecificDoc = await Mentor.findOneAndUpdate(
+          { user: userId },
+          { $set: updateData },
+          { new: true, runValidators: true }
+        );
+        break;
+
+      default:
+        throw new AppError('Invalid role for profile creation', StatusCodes.BAD_REQUEST);
+    }
+
+    if (!roleSpecificDoc) {
+      throw new AppError(`${role} profile not found`, StatusCodes.NOT_FOUND);
+    }
+
+    return {
+      user: user.toJSON(),
+      profile: roleSpecificDoc
+    };
+  }
+
+  /**
+   * Create role-specific profile after registration (for empty profiles)
+   */
+  static async createRoleProfile(userId, role, profileData) {
+    const user = await User.findById(userId);
+    if (!user) {
+      throw new AppError(AUTH_ERRORS.USER_NOT_FOUND, StatusCodes.NOT_FOUND);
+    }
+
+    let roleSpecificDoc;
+    let updateData = {};
+
+    switch (role) {
+      case ROLES.FAMILY:
+        if (!profileData.familyName || !profileData.address) {
+          throw new AppError('Family name and address are required', StatusCodes.BAD_REQUEST);
+        }
+        updateData = {
+          familyName: profileData.familyName.trim(),
+          contactPhone: profileData.contactPhone?.trim() || user.phone,
+          address: profileData.address,
+          preferredContactMethod: profileData.preferredContactMethod || 'email',
+          timezone: profileData.timezone || 'America/New_York'
+        };
+        roleSpecificDoc = await Family.findOneAndUpdate(
+          { user: userId },
+          { $set: updateData },
+          { new: true, runValidators: true }
+        );
+        break;
+
+      case ROLES.STUDENT:
+        if (!profileData.dateOfBirth || !profileData.gradeLevel || !profileData.familyId) {
+          throw new AppError('Date of birth, grade level, and family ID are required', StatusCodes.BAD_REQUEST);
+        }
+        updateData = {
+          family: profileData.familyId,
+          dateOfBirth: new Date(profileData.dateOfBirth),
+          gradeLevel: profileData.gradeLevel,
+          subjects: profileData.subjects || []
+        };
+        roleSpecificDoc = await Student.findOneAndUpdate(
+          { user: userId },
+          { $set: updateData },
+          { new: true, runValidators: true }
+        );
+        break;
+
+      case ROLES.MENTOR:
+        if (!profileData.expertise || !Array.isArray(profileData.expertise) || profileData.expertise.length === 0) {
+          throw new AppError('At least one expertise area is required', StatusCodes.BAD_REQUEST);
+        }
+
+        let safeExperience = { years: 0, description: '' };
+        if (profileData.experience !== undefined && profileData.experience !== null) {
+          if (typeof profileData.experience === 'number') {
+            safeExperience = { years: profileData.experience, description: '' };
+          } else if (typeof profileData.experience === 'object') {
+            safeExperience = profileData.experience;
+          }
+        }
+
+        updateData = {
+          bio: profileData.bio?.trim() || '',
+          expertise: profileData.expertise,
+          qualifications: profileData.qualifications || [],
+          experience: safeExperience,
+          education: profileData.education || [],
+          hourlyRate: profileData.hourlyRate || 0,
+          availability: profileData.availability || [],
+          subjects: profileData.subjects || []
+        };
+        roleSpecificDoc = await Mentor.findOneAndUpdate(
+          { user: userId },
+          { $set: updateData },
+          { new: true, runValidators: true }
+        );
+        break;
+
+      default:
+        throw new AppError('Invalid role for profile creation', StatusCodes.BAD_REQUEST);
+    }
+
+    if (!roleSpecificDoc) {
+      throw new AppError(`${role} profile not found`, StatusCodes.NOT_FOUND);
+    }
+
+    return {
+      user: user.toJSON(),
+      profile: roleSpecificDoc
+    };
   }
 
   /**
@@ -221,28 +390,27 @@ export class AuthService {
   }
 
   /**
-   * Create a student user by family (for family creating their children)
+   * Check if user profile is complete
    */
-  static async createStudentByFamily(familyUserId, studentData) {
-    const familyUser = await User.findById(familyUserId);
-    if (!familyUser || familyUser.role !== ROLES.FAMILY) {
-      throw new AppError('Only Family accounts can create students', StatusCodes.FORBIDDEN);
+  static async isProfileComplete(userId) {
+    const user = await User.findById(userId);
+    if (!user) {
+      throw new AppError(AUTH_ERRORS.USER_NOT_FOUND, StatusCodes.NOT_FOUND);
     }
 
-    const familyDoc = await Family.findOne({ user: familyUserId });
-    if (!familyDoc) {
-      throw new AppError('Family profile not found', StatusCodes.NOT_FOUND);
+    let profile;
+    switch (user.role) {
+      case ROLES.MENTOR:
+        profile = await Mentor.findOne({ user: userId });
+        return profile && profile.profileCompletion > 70; // Example threshold
+      case ROLES.FAMILY:
+        profile = await Family.findOne({ user: userId });
+        return profile && profile.familyName && profile.address;
+      case ROLES.STUDENT:
+        profile = await Student.findOne({ user: userId });
+        return profile && profile.dateOfBirth && profile.gradeLevel && profile.family;
+      default:
+        return true;
     }
-
-    const registrationData = {
-      ...studentData,
-      role: ROLES.STUDENT,
-      profileData: {
-        ...studentData.profileData,
-        familyId: familyDoc._id
-      }
-    };
-
-    return await this.register(registrationData);
   }
 }
