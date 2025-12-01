@@ -1,10 +1,25 @@
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import ParentSignup from "./components/ParentSignup";
+import Navbar from "./components/Navbar";
+import Home from "./pages/home";
+import TopBar from "./pages/TopBar";
+import Footer from "./components/Footer";
+import MentorApplication from "./pages/MentorApplication";
 import MentorDashboard from './pages/MentorDashboard';
-import MentorApplication from './pages/MentorApplication';
+import ParentSignin from "./components/ParentSignin";
+import ExploreMentors from "./components/ExploreMentors";
+import ParentDashboard from "./parents_info/ParentDashboard";
+import HowItWorks from "./components/HowItWorks";
+import About from "./components/AboutSection";
+import ProtectedRoute from "./utils/ProtectedRoute";
+import AdminDashboard from "./admin/AdminDashboard";
+import ParentPostJob from "./parents_info/ParentPostJob";
+import ParentProfile from "./parents_info/ParentProfile";
+import ParentJobsResponses from "./parents_info/ParentJobsResponses";
 import './App.css';
 
-function App() {
-  const [currentView, setCurrentView] = useState('application');
+const App = () => {
   const [mentorProfile, setMentorProfile] = useState(null);
   const [hasApplied, setHasApplied] = useState(false);
 
@@ -17,7 +32,6 @@ function App() {
       const profileData = JSON.parse(savedProfile);
       setMentorProfile(profileData);
       setHasApplied(true);
-      setCurrentView('dashboard');
     }
   }, []);
 
@@ -29,7 +43,6 @@ function App() {
     // Update state with the new profile
     setMentorProfile(profile);
     setHasApplied(true);
-    setCurrentView('dashboard');
   };
 
   const handleLogout = () => {
@@ -38,76 +51,98 @@ function App() {
     localStorage.removeItem('mentorApplied');
     setMentorProfile(null);
     setHasApplied(false);
-    setCurrentView('application');
   };
 
   return (
-    <div className="app">
-      {/* Navigation Header - Only show if mentor has applied */}
-      {hasApplied && (
-        <div className="bg-gray-800 text-white p-4 shadow-lg">
-          <div className="container mx-auto flex justify-between items-center">
-            <h1 className="text-xl font-bold">TANA TEACHINGS</h1>
-            <div className="flex items-center gap-4">
-              <span className="text-sm">Welcome, {mentorProfile?.name}</span>
-              <div className="flex gap-4">
-                <button 
-                  onClick={() => setCurrentView('dashboard')}
-                  className={`px-4 py-2 rounded-lg transition-colors ${
-                    currentView === 'dashboard' 
-                      ? 'bg-gray-200 text-gray-800' 
-                      : 'bg-gray-700 hover:bg-gray-600 text-white'
-                  }`}
-                >
-                  Dashboard
-                </button>
-                <button 
-                  onClick={handleLogout}
-                  className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors"
-                >
-                  Logout
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+    <Router>
+      <div className="flex flex-col min-h-screen">
+        <TopBar />
+        <Navbar />
+        <main className="grow">
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/" element={<Home />} />
+            <Route path="/parent-signup" element={<ParentSignup />} />
+            <Route path="/parent-signin" element={<ParentSignin />} />
+            <Route path="/HowItWorks" element={<HowItWorks />} />
+            <Route path="/About" element={<About />} />
+            <Route path="/explore-mentors" element={<ExploreMentors />} />
+            
+            {/* Mentor Application Route - Show your enhanced version */}
+            <Route 
+              path="/mentor-application" 
+              element={
+                <MentorApplication onApplicationSuccess={handleApplicationSuccess} />
+              } 
+            />
+            
+            {/* Protected Mentor Dashboard Route */}
+            <Route 
+              path="/mentor-dashboard" 
+              element={
+                hasApplied && mentorProfile ? (
+                  <MentorDashboard 
+                    mentorProfile={mentorProfile} 
+                    onLogout={handleLogout}
+                  />
+                ) : (
+                  <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                    <div className="text-center">
+                      <div className="w-24 h-24 bg-gray-800 rounded-full flex items-center justify-center text-white text-3xl mx-auto mb-6">
+                        👨‍🏫
+                      </div>
+                      <h1 className="text-3xl font-bold text-gray-800 mb-4">
+                        Welcome to Tana Teachings
+                      </h1>
+                      <p className="text-gray-600 mb-8 max-w-md">
+                        Join our platform as a mentor and help students achieve their learning goals. 
+                        Start by submitting your application.
+                      </p>
+                      <a
+                        href="/mentor-application"
+                        className="bg-gray-800 hover:bg-gray-700 text-white font-semibold py-3 px-8 rounded-lg transition-colors text-lg inline-block"
+                      >
+                        Start Application
+                      </a>
+                    </div>
+                  </div>
+                )
+              } 
+            />
 
-      {/* Application View - Show when mentor hasn't applied yet */}
-      {!hasApplied && currentView === 'application' && (
-        <MentorApplication onApplicationSuccess={handleApplicationSuccess} />
-      )}
-
-      {/* Dashboard View - Show when mentor has applied (pass the real profile) */}
-      {hasApplied && currentView === 'dashboard' && mentorProfile && (
-        <MentorDashboard mentorProfile={mentorProfile} />
-      )}
-
-      {/* Welcome screen for new mentors */}
-      {!hasApplied && currentView !== 'application' && (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-          <div className="text-center">
-            <div className="w-24 h-24 bg-gray-800 rounded-full flex items-center justify-center text-white text-3xl mx-auto mb-6">
-              👨‍🏫
-            </div>
-            <h1 className="text-3xl font-bold text-gray-800 mb-4">
-              Welcome to Tana Teachings
-            </h1>
-            <p className="text-gray-600 mb-8 max-w-md">
-              Join our platform as a mentor and help students achieve their learning goals. 
-              Start by submitting your application.
-            </p>
-            <button
-              onClick={() => setCurrentView('application')}
-              className="bg-gray-800 hover:bg-gray-700 text-white font-semibold py-3 px-8 rounded-lg transition-colors text-lg"
-            >
-              Start Application
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
+            {/* Protected Parent Routes */}
+            <Route element={<ProtectedRoute allowedRoles={["parent"]} />}>
+              <Route path="/ParentDashboard" element={<ParentDashboard />} />
+            </Route>
+            <Route element={<ProtectedRoute allowedRoles={["parent"]} />}>
+              <Route path="/ParentPostJob" element={<ParentPostJob />} />
+            </Route>
+            <Route element={<ProtectedRoute allowedRoles={["parent"]} />}>
+              <Route path="/ParentProfile" element={<ParentProfile />} />
+            </Route>
+            <Route element={<ProtectedRoute allowedRoles={["parent"]} />}>
+              <Route
+                path="/ParentJobsResponses"
+                element={<ParentJobsResponses />}
+              />
+            </Route>
+            
+            {/* Admin Route */}
+            <Route
+              path="/AdminDashboard"
+              element={
+                <ProtectedRoute
+                  element={<AdminDashboard />}
+                  allowedRoles={["admin"]}
+                />
+              }
+            />
+          </Routes>
+        </main>
+        <Footer />
+      </div>
+    </Router>
   );
-}
+};
 
 export default App;
