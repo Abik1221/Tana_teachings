@@ -76,4 +76,3 @@ Dev server not starting: check port 5173 is free.
 Styling issues: rebuild Tailwind cache with npx tailwindcss -o ./dist/output.css --watch.
 
 © 2025 Tana Teachings — All Rights Reserved.
-```
