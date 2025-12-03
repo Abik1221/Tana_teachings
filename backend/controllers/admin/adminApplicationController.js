@@ -1,5 +1,5 @@
 import { AdminApplicationService } from '../../services/admin/adminApplicationService.js';
-import  catchAsync  from '../../utils/errors/catchAsync.js';
+import  {catchAsync}  from '../../utils/errors/catchAsync.js';
 
 export const adminApplicationController = {
   /**
