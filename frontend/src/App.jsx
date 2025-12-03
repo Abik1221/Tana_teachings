@@ -13,42 +13,35 @@ import HowItWorks from "./components/HowItWorks";
 import About from "./components/AboutSection";
 import ProtectedRoute from "./utils/ProtectedRoute"; // <-- Added
 import AdminDashboard from "./admin/AdminDashboard";
-import ParentPostJob from "./parents_info/ParentPostJob";
 import ParentProfile from "./parents_info/ParentProfile";
-import ParentJobsResponses from "./parents_info/ParentJobsResponses";
+//import MentorDetail from "./parents_info/MentorDetail";
+import ParentPostJob from "./parents_info/ParentPostJob";
+import SuccessMessage from "./pages/SuccessMessage";
+import PasswordFields from "./pages/PasswordFields";
 const App = () => {
   return (
     <Router>
       <div className="flex flex-col min-h-screen">
-        <TopBar />
-        <Navbar />
+        {/* <TopBar /> */}
+
+        {/* <Navbar /> */}
         <main className="grow">
           <Routes>
             {/* Public Routes */}
             <Route path="/" element={<Home />} />
-            //{" "}
-            {/* <Route path="/MentorApplication" element={<MentorApplication />} /> */}
             <Route path="/parent-signup" element={<ParentSignup />} />
             <Route path="/parent-signin" element={<ParentSignin />} />
             <Route path="/HowItWorks" element={<HowItWorks />} />
             <Route path="/About" element={<About />} />
+            <Route path="/ParentPostJob" element={<ParentPostJob />} />
             <Route path="/explore-mentors" element={<ExploreMentors />} />
-            {/* Protected Parent Routes */}
-            <Route element={<ProtectedRoute allowedRoles={["parent"]} />}>
-              <Route path="/ParentDashboard" element={<ParentDashboard />} />
-            </Route>
-            <Route element={<ProtectedRoute allowedRoles={["parent"]} />}>
-              <Route path="/ParentPostJob" element={<ParentPostJob />} />
-            </Route>
+            <Route path="/success-message" element={<SuccessMessage />} />
+            <Route path="/password-fields" element={<PasswordFields />} />
+            <Route path="/ParentDashboard" element={<ParentDashboard />} />
+            <Route path="/AdminDashboard" element={<AdminDashboard />} />
             <Route element={<ProtectedRoute allowedRoles={["parent"]} />}>
               <Route path="/ParentProfile" element={<ParentProfile />} />
             </Route>{" "}
-            <Route element={<ProtectedRoute allowedRoles={["parent"]} />}>
-              <Route
-                path="/ParentJobsResponses"
-                element={<ParentJobsResponses />}
-              />
-            </Route>
             <Route
               path="/AdminDashboard"
               element={
@@ -67,6 +60,7 @@ const App = () => {
                 />
               }
             />
+            {/* <Route path="/mentors/:id" element={<MentorDetail />} /> */}
           </Routes>
         </main>
         <Footer />

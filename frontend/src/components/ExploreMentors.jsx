@@ -1,7 +1,8 @@
 import React from "react";
 import { Mail, Phone } from "lucide-react";
+import { Link } from "react-router-dom"; // for navigation
 
-const ExploreMentors = ({ onSelectMentor }) => {
+const ExploreMentors = () => {
   const mentors = [
     {
       id: 1,
@@ -61,10 +62,10 @@ const ExploreMentors = ({ onSelectMentor }) => {
             <p>
               <strong>Experience:</strong> {mentor.experience}
             </p>
-            <p className="text-gray-700">{mentor.bio}</p>
+            <p className="text-gray-700">{mentor.bio.substring(0, 60)}...</p>
           </div>
 
-          <div className="mt-4 border-t border-gray-200 pt-3 flex justify-between items-center text-sm text-gray-600">
+          <div className="mt-4 flex justify-between items-center text-sm text-gray-600">
             <div className="flex items-center space-x-2">
               <Mail size={15} className="text-indigo-500" />
               <span>{mentor.email}</span>
@@ -75,13 +76,14 @@ const ExploreMentors = ({ onSelectMentor }) => {
             </div>
           </div>
 
-          {/* Select Button */}
-          <button
-            onClick={() => onSelectMentor(mentor)}
-            className="mt-4 w-full bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600 transition"
-          >
-            Select Mentor
-          </button>
+          <div className="mt-4 flex justify-between space-x-2">
+            <Link
+              to={`/mentors/${mentor.id}`}
+              className="flex-1 text-center bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
+            >
+              View Details
+            </Link>
+          </div>
         </div>
       ))}
     </div>

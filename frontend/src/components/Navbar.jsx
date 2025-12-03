@@ -100,7 +100,7 @@ const Navbar = () => {
   const privatePages = [
     "/ParentDashboard",
     "/ParentProfile",
-    "/post-job",
+    "/ParentPostJob",
     "/AdminDashboard",
     "/manage-users",
     "/manage-jobs",
@@ -120,14 +120,9 @@ const Navbar = () => {
   // Private links based on role
   const privateLinks =
     role === "parent"
-      ? [
-          { name: "Home", path: "/" },
-          { name: "For Mentors", path: "/explore-mentors" },
-          { name: "Dashboard", path: "/ParentDashboard" },
-        ]
+      ? [{ name: "Dashboard", path: "/ParentDashboard" }]
       : role === "admin"
       ? [
-          { name: "Home", path: "/" },
           { name: "Admin Panel", path: "/AdminDashboard" },
           { name: "Manage Users", path: "/manage-users" },
           { name: "Manage Jobs", path: "/manage-jobs" },
@@ -226,10 +221,16 @@ const Navbar = () => {
 
                   <div className="flex flex-col">
                     <Link
-                      to="/ParentProfile"
+                      to="/ParentDashboard"
                       className="px-4 py-2 text-gray-700 hover:bg-indigo-50"
                     >
                       My Profile
+                    </Link>
+                    <Link
+                      to="/ParentDashboard"
+                      className="px-4 py-2 text-gray-700 hover:bg-indigo-50"
+                    >
+                      Dashboard
                     </Link>
                     {role === "parent" && (
                       <Link
@@ -361,11 +362,17 @@ const Navbar = () => {
 
           <div className="flex flex-col space-y-2">
             <Link
-              to="/ParentProfile"
+              to="/ParentDashboard"
               onClick={() => setMobileProfileOpen(false)}
               className="px-4 py-2 text-gray-700 hover:bg-indigo-50 rounded"
             >
               My Profile
+            </Link>
+            <Link
+              to="/ParentDashboard"
+              className="px-4 py-2 text-gray-700 hover:bg-indigo-50"
+            >
+              Dashboard
             </Link>
             {role === "parent" && (
               <Link
