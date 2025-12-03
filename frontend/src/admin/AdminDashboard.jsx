@@ -1,93 +1,195 @@
-import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+// src/admin/AdminDashboard.jsx
+import React, { useState } from "react";
+import {
+  BarChart2,
+  Users,
+  Briefcase,
+  FileText,
+  ClipboardList,
+  Menu,
+  X,
+} from "lucide-react";
+import { TbLayoutSidebarRightCollapse } from "react-icons/tb";
 
-const AdminDashboard = () => {
-  const navigate = useNavigate();
-  const storedUser = JSON.parse(localStorage.getItem("user"));
-  const isAuthenticated = localStorage.getItem("token");
+import OverviewSection from "./sections/OverviewSection";
+import UsersSection from "./sections/UsersSection";
+import JobsSection from "./sections/JobsSection";
+import ApplicationsSection from "./sections/ApplicationsSection";
+import ReportsSection from "./sections/ReportsSection";
 
-  useEffect(() => {
-    if (!isAuthenticated || storedUser?.role !== "admin") {
-      navigate("/"); // redirect non-admin users
+export default function AdminDashboard() {
+  const [activeSection, setActiveSection] = useState("overview");
+  const [sidebarOpen, setSidebarOpen] = useState(true); // expanded by default
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const renderSection = () => {
+    switch (activeSection) {
+      case "users":
+        return <UsersSection />;
+      case "jobs":
+        return <JobsSection />;
+      case "applications":
+        return <ApplicationsSection />;
+      case "reports":
+        return <ReportsSection />;
+      default:
+        return <OverviewSection />;
     }
-  }, [storedUser, navigate, isAuthenticated]);
+  };
+
+  const menuItems = [
+    { label: "Overview", icon: <BarChart2 /> },
+    { label: "Users", icon: <Users /> },
+    { label: "Jobs", icon: <Briefcase /> },
+    { label: "Applications", icon: <FileText /> },
+    { label: "Reports", icon: <ClipboardList /> },
+  ];
+
+  // Admin info
+  const admin = {
+    name: localStorage.getItem("fullName") || "Admin User",
+    email: localStorage.getItem("email") || "admin@example.com",
+  };
 
   return (
-    <div className="flex min-h-screen bg-gray-100 dark:bg-gray-900">
-      {/* Sidebar */}
-      <aside className="w-64 bg-white dark:bg-gray-800 shadow-lg p-5">
-        <h2 className="text-xl font-semibold dark:text-white">Admin Panel</h2>
-        <nav className="mt-6 space-y-3">
-          <button
-            className="block w-full text-left py-2 px-3 rounded 
-            hover:bg-gray-200 dark:hover:bg-gray-700 dark:text-gray-300"
-          >
-            📊 Dashboard
-          </button>
-          <button
-            className="block w-full text-left py-2 px-3 rounded 
-            hover:bg-gray-200 dark:hover:bg-gray-700 dark:text-gray-300"
-          >
-            👨‍👩‍👧 Manage Parents
-          </button>
-          <button
-            className="block w-full text-left py-2 px-3 rounded 
-            hover:bg-gray-200 dark:hover:bg-gray-700 dark:text-gray-300"
-          >
-            🎓 Manage Mentors
-          </button>
-          <button
-            className="block w-full text-left py-2 px-3 rounded 
-            hover:bg-gray-200 dark:hover:bg-gray-700 dark:text-gray-300"
-          >
-            📩 Applications
-          </button>
-          <button
-            onClick={() => {
-              localStorage.clear();
-              navigate("/");
-            }}
-            className="block w-full text-left py-2 px-3 text-red-600 font-semibold 
-              hover:bg-red-100 rounded"
-          >
-            🚪 Logout
-          </button>
+    <div className="flex flex-col md:flex-row h-screen bg-gray-100">
+      {/* Desktop Sidebar */}
+      <aside
+        className={`bg-white shadow-lg fixed inset-y-0 left-0 z-50
+          flex flex-col justify-between transition-all duration-300
+          ${sidebarOpen ? "w-56" : "w-20"} hidden md:flex`}
+      >
+        {/* Header with avatar to collapse */}
+        <div
+          className="flex items-center justify-between p-4 border-b cursor-pointer"
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+        >
+          {sidebarOpen ? (
+            <h2 className="font-bold text-lg text-indigo-600">Admin</h2>
+          ) : (
+            <TbLayoutSidebarRightCollapse
+              size={24}
+              className="text-indigo-600"
+            />
+          )}
+        </div>
+
+        {/* Menu */}
+        <nav className="flex flex-col mt-4 space-y-2 flex-1">
+          {menuItems.map((item) => (
+            <SidebarItem
+              key={item.label}
+              label={item.label}
+              icon={item.icon}
+              isActive={activeSection === item.label.toLowerCase()}
+              onClick={() => setActiveSection(item.label.toLowerCase())}
+              sidebarOpen={sidebarOpen}
+            />
+          ))}
         </nav>
+
+        {/* Footer admin info */}
+        <div className="flex items-center p-4 border-t">
+          <img
+            src={`https://ui-avatars.com/api/?name=${admin.name}&background=5B21B6&color=fff`}
+            alt="Admin"
+            className={`w-10 h-10 rounded-full transition-all duration-300 ${
+              sidebarOpen ? "" : "mx-auto"
+            }`}
+          />
+          {sidebarOpen && (
+            <div className="ml-3">
+              <p className="text-sm font-medium">{admin.name}</p>
+              <p className="text-xs text-gray-500 truncate">{admin.email}</p>
+            </div>
+          )}
+        </div>
       </aside>
 
-      {/* Main Content */}
-      <main className="flex-1 p-8">
-        <h1 className="text-3xl font-bold dark:text-white">
-          Welcome, {storedUser?.fullName}
-        </h1>
-        <p className="mt-4 text-gray-700 dark:text-gray-300">
-          Manage users, mentors, and system settings here.
-        </p>
+      {/* Mobile Top Navbar */}
+      <div className="md:hidden fixed top-0 left-0 right-5 bg-white shadow-md z-50 flex items-center justify-between px-4 py-2">
+        <h2 className="font-bold text-indigo-600">Admin</h2>
+        <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+          {mobileMenuOpen ? <X /> : <Menu />}
+        </button>
+      </div>
 
-        {/* Dashboard items */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-          <div className="p-6 bg-white dark:bg-gray-800 shadow rounded-lg">
-            <h3 className="text-lg font-semibold dark:text-white">
-              Total Parents
-            </h3>
-            <p className="text-2xl mt-4 dark:text-gray-300">150</p>
+      {/* Mobile Sidebar */}
+      {mobileMenuOpen && (
+        <div className="md:hidden fixed inset-y-0 left-0 w-56 z-50 bg-white shadow-md h-screen flex flex-col border-r">
+          <div className="flex items-center justify-between p-4 border-b">
+            <h2 className="font-bold text-indigo-600">Admin</h2>
+            <button onClick={() => setMobileMenuOpen(false)}>
+              <X />
+            </button>
           </div>
-          <div className="p-6 bg-white dark:bg-gray-800 shadow rounded-lg">
-            <h3 className="text-lg font-semibold dark:text-white">
-              Total Mentors
-            </h3>
-            <p className="text-2xl mt-4 dark:text-gray-300">45</p>
-          </div>
-          <div className="p-6 bg-white dark:bg-gray-800 shadow rounded-lg">
-            <h3 className="text-lg font-semibold dark:text-white">
-              Pending Applications
-            </h3>
-            <p className="text-2xl mt-4 dark:text-gray-300">12</p>
+          {menuItems.map((item) => (
+            <button
+              key={item.label}
+              onClick={() => {
+                setActiveSection(item.label.toLowerCase());
+                setMobileMenuOpen(false);
+              }}
+              className={`flex items-center gap-3 p-3 transition-all w-full text-left
+                ${
+                  activeSection === item.label.toLowerCase()
+                    ? "bg-indigo-600 text-white"
+                    : "text-gray-700 hover:bg-gray-200"
+                }`}
+            >
+              {item.icon}
+              <span>{item.label}</span>
+            </button>
+          ))}
+          {/* Mobile footer */}
+          <div className="flex items-center p-4 mt-auto border-t">
+            <img
+              src={`https://ui-avatars.com/api/?name=${admin.name}&background=5B21B6&color=fff`}
+              alt="Admin"
+              className="w-10 h-10 rounded-full"
+            />
+            <div className="ml-3">
+              <p className="text-sm font-medium">{admin.name}</p>
+              <p className="text-xs text-gray-500 truncate">{admin.email}</p>
+            </div>
           </div>
         </div>
+      )}
+
+      {/* Overlay for mobile */}
+      {mobileMenuOpen && (
+        <div
+          className="fixed inset-0  opacity-40 md:hidden z-40"
+          onClick={() => setMobileMenuOpen(false)}
+        ></div>
+      )}
+
+      {/* Main Content */}
+      <main
+        className="flex-1 mr-5 mt-12 md:mt-10 overflow-y-auto  transition-all"
+        style={{
+          marginLeft: window.innerWidth >= 768 ? (sidebarOpen ? 280 : 100) : 10,
+        }}
+      >
+        {renderSection()}
       </main>
     </div>
   );
-};
+}
 
-export default AdminDashboard;
+function SidebarItem({ label, icon, isActive, onClick, sidebarOpen }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`flex items-center gap-3 p-3 transition-all duration-300 rounded-lg w-full
+        ${
+          isActive
+            ? "bg-indigo-600 text-white shadow-md"
+            : "text-gray-700 hover:bg-gray-200"
+        }`}
+    >
+      {icon}
+      {sidebarOpen && <span className="text-sm font-medium">{label}</span>}
+    </button>
+  );
+}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+
 import {
   UserPlus,
   Mail,
@@ -10,7 +11,7 @@ import {
   Eye,
   EyeOff,
 } from "lucide-react";
-import { registerUser } from "../services/api";
+import Navbar from "./Navbar";
 
 const ParentSignup = () => {
   const navigate = useNavigate();
@@ -72,7 +73,7 @@ const ParentSignup = () => {
   };
 
   // ===== FORM SUBMIT =====
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
 
     let newErrors = {};
@@ -101,35 +102,20 @@ const ParentSignup = () => {
       return;
     }
 
-    // START LOADING
     setLoading(true);
 
-    try {
-      await registerUser({
-        name: formData.fullName,
-        email: formData.email,
-        password: formData.password,
-        phone: formData.phone,
-        address: formData.address,
-      });
+    // 👉 STORE DATA IN LOCALSTORAGE
+    localStorage.setItem("role", "parent");
+    localStorage.setItem("fullName", formData.fullName);
+    localStorage.setItem("email", formData.email);
+    localStorage.setItem("phone", formData.phone);
+    localStorage.setItem("address", formData.address);
 
-      showToast("Registered successfully!", "success");
-
-      setFormData({
-        fullName: "",
-        email: "",
-        phone: "",
-        address: "",
-        password: "",
-        confirmPassword: "",
-      });
-    } catch (err) {
-      showToast(err.response?.data?.message || "❌ Registration failed");
-    }
-
-    // STOP LOADING
+    showToast("Registered successfully! 🎉", "success");
     setLoading(false);
-    navigate("/parent-signin");
+
+    // 👉 Navigate to parent onboarding step
+    navigate("/ParentPostJob");
   };
   const showToast = (message, type = "success") => {
     setToast({ show: true, message, type });
@@ -143,6 +129,7 @@ const ParentSignup = () => {
   return (
     <>
       {/* Toast is here */}
+      <Navbar></Navbar>
       {toast.show && (
         <div
           className={`fixed top-5 right-5 px-4 py-3 rounded-lg shadow-lg text-white z-50 transition-all duration-300 ${
@@ -210,7 +197,6 @@ const ParentSignup = () => {
                 <p className="text-red-500 text-sm">{errors.fullName}</p>
               )}
             </div>
-
             {/* Email */}
             <div>
               <label className="block text-gray-700 font-medium mb-1">
@@ -237,7 +223,6 @@ const ParentSignup = () => {
                 <p className="text-red-500 text-sm">{errors.email}</p>
               )}
             </div>
-
             {/* Phone */}
             <div>
               <label className="block text-gray-700 font-medium mb-1">
@@ -265,7 +250,6 @@ const ParentSignup = () => {
               )}
             </div>
 
-            {/* Address */}
             <div>
               <label className="block text-gray-700 font-medium mb-1">
                 Address
@@ -292,7 +276,6 @@ const ParentSignup = () => {
               )}
             </div>
 
-            {/* Password */}
             <div>
               <label className="block text-gray-700 font-medium mb-1">
                 Password
@@ -325,7 +308,6 @@ const ParentSignup = () => {
               )}
             </div>
 
-            {/* Confirm Password */}
             <div>
               <label className="block text-gray-700 font-medium mb-1">
                 Confirm Password
@@ -363,7 +345,6 @@ const ParentSignup = () => {
                 <p className="text-red-500 text-sm">{errors.confirmPassword}</p>
               )}
             </div>
-
             {/* Submit */}
             <button
               type="submit"

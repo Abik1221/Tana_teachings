@@ -1,15 +1,16 @@
-// src/services/mockApi.js
-
+// ===============================
+// 📌 LOGIN MOCK
+// ===============================
 export const loginUserMock = async (formData) => {
-  await new Promise((resolve) => setTimeout(resolve, 500)); // simulate delay
+  await new Promise((resolve) => setTimeout(resolve, 500));
 
-  // Mock users
   const users = [
     {
       email: "parent@gmail.com",
       password: "123456",
       token: "mock-parent-token",
       user: {
+        id: 101,
         fullName: "John Doe",
         email: "parent@gmail.com",
         phone: "0912345678",
@@ -22,6 +23,7 @@ export const loginUserMock = async (formData) => {
       password: "admin123",
       token: "mock-admin-token",
       user: {
+        id: 201,
         fullName: "Admin User",
         email: "admin@gmail.com",
         phone: "0900112233",
@@ -32,8 +34,9 @@ export const loginUserMock = async (formData) => {
     {
       email: "m@gmail.com",
       password: "m12345",
-      token: "mock-monitor-token",
+      token: "mock-mentor-token",
       user: {
+        id: 301,
         fullName: "Monitor Staff",
         email: "m@gmail.com",
         phone: "0911223344",
@@ -43,23 +46,24 @@ export const loginUserMock = async (formData) => {
     },
   ];
 
-  // Check login
   const foundUser = users.find(
     (u) => u.email === formData.email && u.password === formData.password
   );
 
-  if (foundUser) {
-    return {
-      data: {
-        token: foundUser.token,
-        user: foundUser.user,
-      },
-    };
-  } else {
+  if (!foundUser)
     throw { response: { data: { message: "Invalid email or password" } } };
-  }
+
+  return {
+    data: {
+      token: foundUser.token,
+      user: foundUser.user,
+    },
+  };
 };
-// Mock jobs posted by parent
+
+// ===============================
+// 📌 PARENT MOCK DATA
+// ===============================
 export const getParentJobsMock = async () => {
   return new Promise((resolve) => {
     setTimeout(() => {
@@ -69,12 +73,14 @@ export const getParentJobsMock = async () => {
             id: "job1",
             title: "Math Tutoring Needed",
             description: "Looking for a mentor for high school math.",
+            status: "approved",
             datePosted: new Date(),
           },
           {
             id: "job2",
             title: "Programming Tutor",
             description: "Need help for my child in Python programming.",
+            status: "pending_approval",
             datePosted: new Date(),
           },
         ],
@@ -83,33 +89,29 @@ export const getParentJobsMock = async () => {
   });
 };
 
-// Mock mentor responses per job
+export const postJobMock = (jobData) =>
+  new Promise((resolve) => {
+    console.log("Job posted (mock):", jobData);
+    setTimeout(() => resolve({ success: true }), 1000);
+  });
+
 export const getMentorResponsesMock = async (jobId) => {
   const responses = {
     job1: [
-      {
-        id: "r1",
-        mentorName: "John Doe",
-        message: "I can help with Algebra and Geometry.",
-      },
-      {
-        id: "r2",
-        mentorName: "Jane Smith",
-        message: "Experienced in Calculus tutoring.",
-      },
+      { id: "r1", mentorName: "John Doe", message: "Expert in Algebra." },
+      { id: "r2", mentorName: "Jane Smith", message: "I teach geometry." },
     ],
     job2: [
       {
         id: "r3",
         mentorName: "Alice Brown",
-        message: "Python expert here, can guide your child.",
+        message: "I can help in Python and logic.",
       },
     ],
   };
+
   return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({ data: responses[jobId] || [] });
-    }, 500);
+    setTimeout(() => resolve({ data: responses[jobId] || [] }), 500);
   });
 };
 
@@ -123,8 +125,77 @@ export const subjectsByClass = {
   7: ["Maths", "Physics", "Chemistry", "Biology", "English"],
   8: ["Maths", "Physics", "Chemistry", "Biology", "English"],
 };
-export const postJobMock = (jobData) =>
-  new Promise((resolve) => {
-    console.log("Job posted (mock):", jobData);
-    setTimeout(() => resolve({ success: true }), 1000);
-  });
+
+// ===============================
+// 📌 ADMIN MOCK DATA
+// ===============================
+export const getDashboardOverviewMock = () => {
+  return {
+    totalParents: 125,
+    totalMentors: 48,
+    totalJobs: 37,
+    pendingApprovals: 5,
+  };
+};
+
+export const getUsersMock = () => {
+  return [
+    {
+      id: 201,
+      name: "Admin User",
+      role: "admin",
+      status: "active",
+      email: "admin@gmail.com",
+    },
+    {
+      id: 101,
+      name: "John Doe",
+      role: "parent",
+      status: "active",
+      email: "parent@gmail.com",
+    },
+    {
+      id: 301,
+      name: "Monitor Staff",
+      role: "mentor",
+      status: "pending",
+      email: "m@gmail.com",
+    },
+  ];
+};
+
+export const getJobsMock = () => {
+  return [
+    {
+      id: 101,
+      title: "Math Tutor",
+      parent: "John Doe",
+      status: "pending_approval",
+      priority: "High",
+    },
+    {
+      id: 102,
+      title: "Physics Tutor",
+      parent: "Samuel K",
+      status: "approved",
+      priority: "Medium",
+    },
+  ];
+};
+
+export const getApplicationsMock = () => {
+  return [
+    {
+      id: 501,
+      mentor: "Sarah S",
+      jobTitle: "Math Tutor",
+      status: "pending_vetting",
+    },
+    {
+      id: 502,
+      mentor: "Mike B",
+      jobTitle: "Physics Tutor",
+      status: "rejected",
+    },
+  ];
+};

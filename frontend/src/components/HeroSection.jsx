@@ -3,7 +3,10 @@ import { Link } from "react-router-dom";
 
 const HeroSection = () => {
   return (
-    <div className="relative bg-gray-100 h-[60vh] lg:h-[70vh] flex items-center justify-center overflow-hidden pt-16 md:pt-32">
+    <div
+      id="HeroSection"
+      className="relative bg-gray-100 h-[60vh] lg:h-[70vh] flex items-center justify-center overflow-hidden pt-16 md:pt-32"
+    >
       <div
         className="absolute inset-0 bg-cover bg-center"
         style={{
