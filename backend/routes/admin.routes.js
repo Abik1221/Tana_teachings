@@ -2,7 +2,6 @@ import express from 'express';
 import { authenticate } from '../middleware/auth/authenticate.js';
 import { restrictTo } from '../middleware/authorization/roles.js';
 import { ROLES } from '../config/constants.js';
-console.log('[debug] admin.routes.js loaded');
 
 // Import admin controllers
 import { adminJobController } from '../controllers/admin/adminJobController.js';
