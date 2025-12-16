@@ -8,6 +8,8 @@ import { StatusCodes } from "http-status-codes";
 export const restrictTo = (...allowedRoles) => {
   return (req, res, next) => {
     // req.user is set by the 'authenticate' middleware
+    console.log(req.user.role)
+    console.log(allowedRoles)
     if (!req.user || !allowedRoles.includes(req.user.role)) {
       return next(
         new AppError(
